@@ -33,13 +33,13 @@ class GuidingNet(nn.Module):
         self._initialize_weights()
 
     def forward(self, x, sty=False):
-        x = self.features(x)
-        x = F.adaptive_avg_pool2d(x, (1, 1))
-        flat = x.view(x.size(0), -1)
-        cont = self.cont(flat)
+        x = self.features(x)  # 32x512x4x4
+        x = F.adaptive_avg_pool2d(x, (1, 1))  # 32x512x1x1
+        flat = x.view(x.size(0), -1)  # 32x512
+        cont = self.cont(flat)  # 32x128
         if sty:
             return cont
-        disc = self.disc(flat)
+        disc = self.disc(flat)  # 32x10
         return {'cont': cont, 'disc': disc}
 
     def _initialize_weights(self):
@@ -56,17 +56,17 @@ class GuidingNet(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
     def moco(self, x):
-        x = self.features(x)
-        x = F.adaptive_avg_pool2d(x, (1, 1))
-        flat = x.view(x.size(0), -1)
-        cont = self.cont(flat)
+        x = self.features(x)  # 32x512x4x4
+        x = F.adaptive_avg_pool2d(x, (1, 1))  # 32x512x1x1
+        flat = x.view(x.size(0), -1)  # 32x512x1x1
+        cont = self.cont(flat)  # 32x128
         return cont
 
     def iic(self, x):
         x = self.features(x)
-        x = F.adaptive_avg_pool2d(x, (1, 1))
-        flat = x.view(x.size(0), -1)
-        disc = self.disc(flat)
+        x = F.adaptive_avg_pool2d(x, (1, 1))  # 32x512x4x4
+        flat = x.view(x.size(0), -1)  # 32x512x1x1
+        disc = self.disc(flat)  # 32x10
         return disc
 
 

@@ -40,7 +40,8 @@ from tensorboardX import SummaryWriter
 # Configuration
 parser = argparse.ArgumentParser(description='PyTorch GAN Training')
 parser.add_argument('--dataset', default='animal_faces', help='Dataset name to use',
-                    choices=['afhq_cat', 'afhq_dog', 'afhq_wild', 'animal_faces', 'photo2ukiyoe', 'summer2winter', 'lsun_car', 'ffhq'])
+                    choices=['afhq_cat', 'afhq_dog', 'afhq_wild', 'animal_faces', 'photo2ukiyoe',
+                             'summer2winter', 'lsun_car', 'ffhq'])
 parser.add_argument('--data_path', type=str, default='../data',
                     help='Dataset directory. Please refer Dataset in README.md')
 parser.add_argument('--workers', default=4, type=int, help='the number of workers of data loader')
@@ -51,8 +52,7 @@ parser.add_argument('--model_name', type=str, default='GAN',
 
 parser.add_argument('--epochs', default=200, type=int, help='Total number of epochs to run. Not actual epoch.')
 parser.add_argument('--iters', default=1000, type=int, help='Total number of iterations per epoch')
-parser.add_argument('--batch_size', default=32, type=int,
-                    help='Batch size for training')
+parser.add_argument('--batch_size', default=32, type=int, help='Batch size for training')
 parser.add_argument('--val_batch', default=10, type=int,
                     help='Batch size for validation. '
                          'The result images are stored in the form of (val_batch, val_batch) grid.')
@@ -76,12 +76,9 @@ parser.add_argument('--load_model', default=None, type=str, metavar='PATH',
 parser.add_argument('--validation', dest='validation', action='store_true',
                     help='Call for valiation only mode')
 
-parser.add_argument('--world-size', default=1, type=int,
-                    help='number of nodes for distributed training')
-parser.add_argument('--rank', default=0, type=int,
-                    help='node rank for distributed training')
-parser.add_argument('--gpu', default='0', type=str,
-                    help='GPU id to use.')
+parser.add_argument('--world-size', default=1, type=int, help='number of nodes for distributed training')
+parser.add_argument('--rank', default=0, type=int, help='node rank for distributed training')
+parser.add_argument('--gpu', default='0', type=str, help='GPU id to use.')
 parser.add_argument('--ddp', dest='ddp', action='store_true', help='Call if using DDP')
 parser.add_argument('--port', default='8989', type=str)
 
@@ -382,21 +379,18 @@ def build_model(args):
             networks[name] = torch.nn.DataParallel(net).cuda()
 
     if 'C' in args.to_train:
-        opts['C'] = torch.optim.Adam(
-            networks['C'].module.parameters() if args.distributed else networks['C'].parameters(),
-            1e-4, weight_decay=0.001)
+        opts['C'] = torch.optim.Adam(networks['C'].module.parameters() if args.distributed else networks['C'].parameters(),
+                                     1e-4, weight_decay=0.001)
         if args.distributed:
             networks['C_EMA'].module.load_state_dict(networks['C'].module.state_dict())
         else:
             networks['C_EMA'].load_state_dict(networks['C'].state_dict())
     if 'D' in args.to_train:
-        opts['D'] = torch.optim.RMSprop(
-            networks['D'].module.parameters() if args.distributed else networks['D'].parameters(),
-            1e-4, weight_decay=0.0001)
+        opts['D'] = torch.optim.RMSprop(networks['D'].module.parameters() if args.distributed else networks['D'].parameters(),
+                                        1e-4, weight_decay=0.0001)
     if 'G' in args.to_train:
-        opts['G'] = torch.optim.RMSprop(
-            networks['G'].module.parameters() if args.distributed else networks['G'].parameters(),
-            1e-4, weight_decay=0.0001)
+        opts['G'] = torch.optim.RMSprop(networks['G'].module.parameters() if args.distributed else networks['G'].parameters(),
+                                        1e-4, weight_decay=0.0001)
 
     return networks, opts
 

@@ -81,12 +81,12 @@ def trainGAN_UNSUP(data_loader, networks, opts, epoch, args, additional):
         # BEGIN Train C #
         #################
         training_mode = 'ONLYCLS'
-        q_cont = C.moco(x_org)
+        q_cont = C.moco(x_org)  # 32x128
         k_cont = C_EMA.moco(x_tf)
         k_cont = k_cont.detach()
 
-        q_disc = C.iic(x_org)
-        k_disc = C.iic(x_tf)
+        q_disc = C.iic(x_org)  # 32x10
+        k_disc = C.iic(x_tf)  # 32x10
 
         q_disc = F.softmax(q_disc, 1)
         k_disc = F.softmax(k_disc, 1)
